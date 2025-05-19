@@ -7,6 +7,7 @@ const {
   getAllExpert,
   getAllGrage,
   findGestionnaire,
+  getListAdminSidBar,
 } = require("../controller/admin");
 const router = express.Router();
 
@@ -16,4 +17,5 @@ router.post("/AjouterExpert", AjouterExpert);
 router.get("/getExpert", getAllExpert);
 router.post("/AjouterGrage", AjouterGrage);
 router.get("/getgrage", getAllGrage);
+router.get("/getListAdminSidBar", getListAdminSidBar);
 module.exports = router;

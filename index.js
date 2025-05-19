@@ -13,6 +13,7 @@ var bodyParser = require("body-parser");
 const path = require("path");
 const Admin = require("./models/Admin");
 const AdminRoutes = require("./routes/admin");
+const FraudRoutes = require("./routes/fraud");
 
 const bcrypt = require("bcrypt");
 // app.use(bodyParser.urlencoded());
@@ -62,6 +63,7 @@ app.use("/api/auth", auth);
 app.use("/api/upload", upload);
 app.use("/api/addConstat", addConstat);
 app.use("/api/message", message);
+app.use("/api/fraud", FraudRoutes);
 // Configuration de MongoDB
 
 app.use((req, res, next) => {

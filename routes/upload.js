@@ -94,8 +94,6 @@ const upload = multer({ storage });
 // Route pour uploader les fichiers localement
 router.post("/upload", upload.array("files", 10), async (req, res) => {
   try {
-    console.log(" Upload local reçu :", req.files?.length || 0);
-
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "Aucun fichier téléchargé." });
     }

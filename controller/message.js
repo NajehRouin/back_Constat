@@ -1,6 +1,7 @@
 const Message = require("../models/message");
 const Conversation = require("../models/conversation");
 const { io, getReceiverSocketId } = require("../socket/socket");
+const Admin = require("../models/Admin");
 
 const sendMessage = async (req, res) => {
   try {
@@ -16,54 +17,25 @@ const sendMessage = async (req, res) => {
     }
 
     let conversation;
-
-    // Si l'expéditeur est un admin, recherche uniquement par receiverId et receiverModel
-    if (senderModel === "Admin") {
-      conversation = await Conversation.findOne({
-        participants: {
-          $all: [
-            {
-              $elemMatch: {
-                participantId: receiverId,
-                participantModel: receiverModel,
-              },
+    conversation = await Conversation.findOne({
+      participants: {
+        $all: [
+          {
+            $elemMatch: {
+              participantId: senderId,
+              participantModel: senderModel,
             },
-          ],
-        },
-      });
-    } else {
-      // Si l'expéditeur est un utilisateur, recherche la conversation par senderId ou receiverId
-      conversation = await Conversation.findOne({
-        participants: {
-          $all: [
-            {
-              $elemMatch: {
-                participantId: senderId, // L'id de l'utilisateur connecté
-                participantModel: senderModel,
-              },
-            },
-          ],
-        },
-      });
-
-      // Recherche aussi par l'inverse, c'est-à-dire si l'utilisateur est le destinataire et non l'expéditeur
-      if (!conversation) {
-        conversation = await Conversation.findOne({
-          participants: {
-            $all: [
-              {
-                $elemMatch: {
-                  participantId: receiverId, // L'id du destinataire
-                  participantModel: receiverModel,
-                },
-              },
-            ],
           },
-        });
-      }
-    }
+          {
+            $elemMatch: {
+              participantId: receiverId,
+              participantModel: receiverModel,
+            },
+          },
+        ],
+      },
+    });
 
-    // Si aucune conversation n'existe, crée une nouvelle conversation
     if (!conversation) {
       conversation = await Conversation.create({
         participants: [
@@ -107,7 +79,7 @@ const getMessages = async (req, res) => {
     const isAdmin = !!req.admin;
     const senderId = isAdmin ? req.admin._id : req.user._id;
     const senderModel = isAdmin ? "Admin" : "User";
-    console.log("senderModel", otherUserModel);
+
     const conversation = await Conversation.findOne({
       participants: {
         $all: [
@@ -139,13 +111,23 @@ const getMessages = async (req, res) => {
 const getUserConversations = async (req, res) => {
   try {
     const userId = req.user._id;
-
+    const { receiverId } = req.body;
     const conversations = await Conversation.findOne({
       participants: {
-        $elemMatch: {
-          participantId: userId,
-          participantModel: "User",
-        },
+        $all: [
+          {
+            $elemMatch: {
+              participantId: receiverId,
+              participantModel: "Admin",
+            },
+          },
+          {
+            $elemMatch: {
+              participantId: userId,
+              participantModel: "User",
+            },
+          },
+        ],
       },
     }).populate("messages");
 
@@ -160,12 +142,24 @@ const getUserConversationsByAdmin = async (req, res) => {
   try {
     const userId = req.params.userId;
 
+    let findAdmin = await Admin.findById({ _id: req.admin._id });
+
     const conversations = await Conversation.findOne({
       participants: {
-        $elemMatch: {
-          participantId: userId,
-          participantModel: "User",
-        },
+        $all: [
+          {
+            $elemMatch: {
+              participantId: findAdmin?._id,
+              participantModel: "Admin",
+            },
+          },
+          {
+            $elemMatch: {
+              participantId: userId,
+              participantModel: "User",
+            },
+          },
+        ],
       },
     }).populate("messages");
 

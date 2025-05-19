@@ -114,6 +114,18 @@ const getAllGrage = async (req, res) => {
   }
 };
 
+const getListAdminSidBar = async (req, res) => {
+  try {
+    const findAdmin = await Admin.find().select("name role");
+
+    res.status(200).json({ result: findAdmin, succes: true, error: false });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message, succes: false, error: true });
+  }
+};
+
 module.exports = {
   getCurrentAdmin,
   AjouterExpert,
@@ -121,4 +133,5 @@ module.exports = {
   getAllExpert,
   getAllGrage,
   findGestionnaire,
+  getListAdminSidBar,
 };

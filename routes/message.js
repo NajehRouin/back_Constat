@@ -17,7 +17,7 @@ router.get("/:id", auth, getMessages);
 // Exemple : POST /api/messages/send/65fd...123  body: { message: "Hello", receiverModel: "Admin" }
 router.post("/send/:id", auth, sendMessage);
 
-router.get("/message/conversations", auth, getUserConversations);
+router.post("/message/conversations", auth, getUserConversations);
 
 router.get("/getConversationUser/:userId", auth, getUserConversationsByAdmin);
 

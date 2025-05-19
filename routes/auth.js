@@ -46,7 +46,7 @@ router.post("/", validateWith(userSchema), async (req, res) => {
       process.env.JWT_SECRET || "jwtPrivateKey", // Clé secrète pour signer le token
 
       {
-        expiresIn: 60 * 60 * 2, // 2h
+        expiresIn: 60 * 60 * 5, // 2h
       }
     );
 
